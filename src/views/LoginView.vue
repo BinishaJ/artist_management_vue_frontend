@@ -67,7 +67,7 @@ const onSubmit = form.handleSubmit((values) => {
                 <Input
                   v-bind:type="[showPassword ? 'text' : 'password']"
                   v-bind="componentField"
-                  class="pr-10"
+                  class="pr-10 max-w-[none]"
                   v-model="password"
                 />
                 <span

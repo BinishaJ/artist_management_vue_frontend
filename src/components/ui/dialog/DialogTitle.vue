@@ -1,11 +1,9 @@
 <script setup>
 import { computed } from "vue";
-import { TabsContent } from "radix-vue";
+import { DialogTitle, useForwardProps } from "radix-vue";
 import { cn } from "@/lib/utils";
 
 const props = defineProps({
-  value: { type: [String, Number], required: true },
-  forceMount: { type: Boolean, required: false },
   asChild: { type: Boolean, required: false },
   as: { type: null, required: false },
   class: { type: null, required: false },
@@ -16,18 +14,17 @@ const delegatedProps = computed(() => {
 
   return delegated;
 });
+
+const forwardedProps = useForwardProps(delegatedProps);
 </script>
 
 <template>
-  <TabsContent
+  <DialogTitle
+    v-bind="forwardedProps"
     :class="
-      cn(
-        'mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        props.class,
-      )
+      cn('text-lg font-semibold leading-none tracking-tight', props.class)
     "
-    v-bind="delegatedProps"
   >
     <slot />
-  </TabsContent>
+  </DialogTitle>
 </template>

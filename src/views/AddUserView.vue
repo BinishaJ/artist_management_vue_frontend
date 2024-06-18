@@ -3,11 +3,11 @@ import NewUserView from "./NewUserView.vue";
 import { ref } from "vue";
 
 const details = ref({
-  title: "Register Yourself",
-  description: "Enter your details",
-  button: "Sign Up",
-  toast: "User Registered",
-  redirect: "/",
+  title: "Create a new user",
+  description: "Enter the details",
+  button: "Create",
+  toast: "User Created",
+  redirect: "/users",
 });
 </script>
 

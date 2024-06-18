@@ -122,7 +122,7 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-  <div class="flex justify-center items-center min-h-screen my-12">
+  <div class="flex justify-center items-center my-12">
     <Card class="w-3/4 md:w-[60%] lg:w-[40%]">
       <form class="space-y-4 p-6" @submit.prevent="onSubmit">
         <CardHeader>

@@ -43,7 +43,7 @@ const onSubmit = form.handleSubmit((values) => {
 </script>
 
 <template>
-  <div class="min-h-screen w-full flex justify-center items-center">
+  <div class="w-full flex justify-center items-center">
     <div class="w-full md:w-[50%] flex flex-col justify-center items-center">
       <div class="mb-8">
         <p class="font-semibold text-3xl mb-2">Welcome Back!</p>

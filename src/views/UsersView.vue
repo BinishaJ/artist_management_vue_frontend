@@ -245,7 +245,7 @@ const deleteUser = () => {
           <TableCell>{{ user.address }}</TableCell>
           <TableCell>
             <router-link to="/users/edit"
-              ><Button class="bg-blue-800 hover:bg-blue-900 mr-2"
+              ><Button class="mb-2 xl:mb-0 bg-blue-800 hover:bg-blue-900 mr-2"
                 >Edit</Button
               ></router-link
             >

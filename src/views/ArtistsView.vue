@@ -16,7 +16,7 @@ import {
   PaginationPrev,
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-vue-next";
+import { Plus, Music2 } from "lucide-vue-next";
 import { ref } from "vue";
 import {
   Dialog,
@@ -220,11 +220,16 @@ const deleteArtist = () => {
           <TableCell>{{ artist.first_release_year }}</TableCell>
           <TableCell>{{ artist.no_of_albums_released }}</TableCell>
           <TableCell>
-            <RouterLink :to="`/artists/${artist.id}/songs`"
-              ><Button variant="outline" type="button"> Songs </Button>
+            <RouterLink :to="`/artists/${artist.id}/songs`" class="align-middle"
+              ><Button
+                type="button"
+                class="mb-2 xl:mb-0 mr-2 bg-[#5f9ea0] hover:bg-[#498183]"
+              >
+                <Music2 stroke-width="3" class="text-[yellow]" />
+              </Button>
             </RouterLink>
             <router-link to="/artists/edit"
-              ><Button class="bg-blue-800 hover:bg-blue-900 mr-2"
+              ><Button class="mb-2 xl:mb-0 bg-blue-800 hover:bg-blue-900 mr-2"
                 >Edit</Button
               ></router-link
             >

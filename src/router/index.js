@@ -6,8 +6,10 @@ import UsersView from "../views/UsersView.vue";
 import ArtistsView from "../views/ArtistsView.vue";
 import AddUserView from "../views/AddUserView.vue";
 import AddArtistView from "../views/AddArtistView.vue";
+import AddSongView from "../views/AddSongView.vue";
 import EditUserView from "../views/EditUserView.vue";
 import EditArtistView from "../views/EditArtistView.vue";
+import EditSongView from "../views/EditSongView.vue";
 import SongsView from "../views/SongsView.vue";
 
 const router = createRouter({
@@ -67,7 +69,20 @@ const router = createRouter({
         },
         {
           path: ":id/songs",
-          component: SongsView,
+          children: [
+            {
+              path: "",
+              component: SongsView,
+            },
+            {
+              path: "add",
+              component: AddSongView,
+            },
+            {
+              path: ":song_id/edit",
+              component: EditSongView,
+            },
+          ],
         },
       ],
     },

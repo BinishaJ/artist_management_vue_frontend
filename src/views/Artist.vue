@@ -25,11 +25,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { ref, computed, reactive, defineProps } from "vue";
+import { computed, reactive, defineProps } from "vue";
 import * as z from "zod";
 import { toTypedSchema } from "@vee-validate/zod";
 import { Calendar } from "@/components/ui/calendar";
-import { Calendar as CalendarIcon, Eye, EyeOff } from "lucide-vue-next";
+import { Calendar as CalendarIcon } from "lucide-vue-next";
 import { toDate } from "radix-vue/date";
 import {
   Popover,
@@ -67,12 +67,8 @@ const props = defineProps({
       type: String,
       required: true,
     },
-    redirect: {
-      type: String,
-      required: true,
-    },
   },
-  user: Object,
+  artist: Object,
 });
 
 const df = new DateFormatter("en-US", {
@@ -80,23 +76,15 @@ const df = new DateFormatter("en-US", {
 });
 
 const initialState = {
-  first_name: "",
-  last_name: "",
-  email: "",
-  password: "",
-  phone: "",
+  name: "",
   dob: "",
   gender: "",
   address: "",
+  first_release_year: "",
+  no_of_albums_released: "",
 };
 
-const data = reactive({ ...initialState, ...props.user });
-
-let showPassword = ref(false);
-
-const showPasswordField = () => {
-  showPassword.value = !showPassword.value;
-};
+const data = reactive({ ...initialState, ...props.artist });
 
 const value = computed({
   get: () => (values.dob ? parseDate(values.dob) : undefined),
@@ -105,20 +93,15 @@ const value = computed({
 
 const formSchema = toTypedSchema(
   z.object({
-    first_name: z.string().optional().or(z.literal("")),
-    last_name: z.string().optional().or(z.literal("")),
-    email: z.string().min(1, { message: "Field is required" }).email(),
-    password: props.user
-      ? z.string().optional().or(z.literal(""))
-      : z.string().min(8, { message: "Password must be atleast 8 characters" }),
-    phone: z
-      .string()
-      .max(20, { message: "Phone cannot exceed max length of 20" })
-      .optional()
-      .or(z.literal("")),
-    dob: z.string().date().optional().or(z.literal("")),
-    gender: z.string().optional().or(z.literal("")),
-    address: z.string().optional().or(z.literal("")),
+    name: z.string().min(1, { message: "Field is required" }),
+    dob: z.string().min(1, { message: "Field is required" }).date(),
+    gender: z.string().min(1, { message: "Field is required" }),
+    address: z.string().min(1, { message: "Field is required" }),
+    first_release_year: z
+      .number({ message: "Field is required" })
+      .min(1950)
+      .max(new Date().getFullYear()),
+    no_of_albums_released: z.number({ message: "Field is required" }).min(0),
   })
 );
 
@@ -132,7 +115,7 @@ const onSubmit = handleSubmit((values) => {
   Object.assign(data, initialState);
   toast.success(props.details.toast, {
     onClose: () => {
-      router.push({ path: props.details.redirect });
+      router.push({ path: "/artists" });
     },
   });
 });
@@ -147,91 +130,14 @@ const onSubmit = handleSubmit((values) => {
           <CardDescription>{{ props.details.description }}</CardDescription>
         </CardHeader>
         <CardContent>
-          <FormField v-slot="{ componentField }" name="first_name">
+          <FormField v-slot="{ componentField }" name="name">
             <FormItem class="label_margin">
-              <FormLabel class="text-inherit text-base">First Name</FormLabel>
+              <FormLabel class="text-inherit text-base">Name</FormLabel>
               <FormControl>
                 <Input
                   type="text"
                   v-bind="componentField"
-                  v-model="data.first_name"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-
-          <FormField v-slot="{ componentField }" name="last_name">
-            <FormItem class="label_margin">
-              <FormLabel class="text-inherit text-base">Last Name</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  v-bind="componentField"
-                  v-model="data.last_name"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-
-          <FormField v-slot="{ componentField }" name="email">
-            <FormItem class="label_margin">
-              <FormLabel class="text-inherit text-base">Email</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  v-bind="componentField"
-                  v-model="data.email"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-
-          <FormField
-            v-if="!props.user"
-            v-slot="{ componentField }"
-            name="password"
-          >
-            <FormItem class="label_margin">
-              <FormLabel class="text-inherit text-base">Password</FormLabel>
-              <div class="relative">
-                <FormControl>
-                  <Input
-                    v-bind:type="[showPassword ? 'text' : 'password']"
-                    v-bind="componentField"
-                    v-model="data.password"
-                  />
-                  <span
-                    class="absolute end-0 inset-y-0 flex items-center justify-center px-3"
-                  >
-                    <Button
-                      class="p-0 bg-transparent hover:bg-transparent"
-                      @click="showPasswordField"
-                      type="button"
-                    >
-                      <Eye
-                        v-if="showPassword"
-                        class="size-5 text-muted-foreground"
-                      />
-                      <EyeOff v-else class="size-5 text-muted-foreground" />
-                    </Button>
-                  </span>
-                </FormControl>
-              </div>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-
-          <FormField v-slot="{ componentField }" name="phone">
-            <FormItem class="label_margin">
-              <FormLabel class="text-inherit text-base">Phone</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  v-bind="componentField"
-                  v-model="data.phone"
+                  v-model="data.name"
                 />
               </FormControl>
               <FormMessage />
@@ -320,13 +226,43 @@ const onSubmit = handleSubmit((values) => {
               <FormMessage />
             </FormItem>
           </FormField>
+
+          <FormField v-slot="{ componentField }" name="first_release_year">
+            <FormItem class="label_margin">
+              <FormLabel class="text-inherit text-base"
+                >First Release Year</FormLabel
+              >
+              <FormControl>
+                <Input
+                  type="number"
+                  v-bind="componentField"
+                  v-model="data.first_release_year"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="no_of_albums_released">
+            <FormItem class="label_margin">
+              <FormLabel class="text-inherit text-base"
+                >No of Albums Released</FormLabel
+              >
+              <FormControl>
+                <Input
+                  type="number"
+                  v-bind="componentField"
+                  v-model="data.no_of_albums_released"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
         </CardContent>
         <CardFooter class="flex justify-between px-6 pb-6">
-          <RouterLink :to="props.details.redirect"
-            ><Button variant="outline" type="button">
-              Cancel
-            </Button></RouterLink
-          >
+          <RouterLink to="/artists"
+            ><Button variant="outline" type="button"> Cancel </Button>
+          </RouterLink>
           <Button type="submit">{{ props.details.button }}</Button>
         </CardFooter>
       </form>

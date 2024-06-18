@@ -32,140 +32,118 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 
-const users = ref([
+const artists = ref([
   {
     id: 1,
-    first_name: "First",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
+    name: "First",
     dob: "2021-02-14",
     gender: "m",
     address: "Address",
+    first_release_year: 2013,
+    no_of_albums_released: 10,
   },
   {
     id: 2,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
+    name: "Last",
     dob: "2021-02-14",
-    gender: "f",
+    gender: "m",
     address: "Address",
+    first_release_year: 2013,
+    no_of_albums_released: 10,
   },
   {
     id: 3,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
+    name: "ABC",
     dob: "2021-02-14",
     gender: "m",
     address: "Address",
+    first_release_year: 2011,
+    no_of_albums_released: 3,
   },
   {
     id: 4,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
+    name: "First",
     dob: "2021-02-14",
     gender: "m",
     address: "Address",
+    first_release_year: 2013,
+    no_of_albums_released: 10,
   },
   {
     id: 5,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
+    name: "First",
     dob: "2021-02-14",
-    gender: "f",
+    gender: "m",
     address: "Address",
+    first_release_year: 2013,
+    no_of_albums_released: 10,
   },
   {
     id: 6,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
+    name: "First",
     dob: "2021-02-14",
-    gender: "o",
+    gender: "m",
     address: "Address",
+    first_release_year: 2013,
+    no_of_albums_released: 10,
   },
   {
     id: 7,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
+    name: "First",
     dob: "2021-02-14",
     gender: "m",
     address: "Address",
+    first_release_year: 2013,
+    no_of_albums_released: 10,
   },
   {
     id: 8,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
+    name: "First",
     dob: "2021-02-14",
     gender: "m",
     address: "Address",
+    first_release_year: 2013,
+    no_of_albums_released: 10,
   },
   {
     id: 9,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "o",
-    address: "Address",
-  },
-  {
-    id: 10,
-    first_name: "Ten",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "o",
-    address: "Address",
-  },
-  {
-    id: 11,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "o",
-    address: "Address",
-  },
-  {
-    id: 12,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "o",
-    address: "Address",
-  },
-  {
-    id: 13,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
+    name: "First",
     dob: "2021-02-14",
     gender: "m",
     address: "Address",
+    first_release_year: 2013,
+    no_of_albums_released: 10,
+  },
+  {
+    id: 10,
+    name: "XYZ",
+    dob: "2021-02-14",
+    gender: "m",
+    address: "Address",
+    first_release_year: 2013,
+    no_of_albums_released: 10,
+  },
+  {
+    id: 11,
+    name: "Hi",
+    dob: "2021-02-14",
+    gender: "m",
+    address: "Address",
+    first_release_year: 2013,
+    no_of_albums_released: 10,
+  },
+  {
+    id: 12,
+    name: "bpa",
+    dob: "2021-02-14",
+    gender: "m",
+    address: "Address",
+    first_release_year: 2013,
+    no_of_albums_released: 10,
   },
 ]);
 
-const totalUsers = users.value.length;
+const totalArtists = artists.value.length;
 
 const displayGender = (gender) => {
   if (gender === "m") {
@@ -177,92 +155,93 @@ const displayGender = (gender) => {
   }
 };
 
-const paginatedUsers = ref(users.value.slice(0, 10));
+const paginatedArtists = ref(artists.value.slice(0, 10));
 
 const handlePageChange = (page) => {
   const max = page === 1 ? 10 : 13;
-  paginatedUsers.value = users.value.slice((page - 1) * 10, max);
+  paginatedArtists.value = artists.value.slice((page - 1) * 10, max);
 };
 
 const isDialogOpen = ref(false);
-const userToDelete = ref(null);
+const artistToDelete = ref(null);
 
-const openDialog = (userId) => {
-  userToDelete.value = userId;
+const openDialog = (artistId) => {
+  artistToDelete.value = artistId;
   isDialogOpen.value = true;
 };
 
 const closeDialog = () => {
   isDialogOpen.value = false;
-  userToDelete.value = null;
+  artistToDelete.value = null;
 };
 
-const deleteUser = () => {
-  console.log("User deleted ", userToDelete.value);
+const deleteArtist = () => {
+  console.log("Artist deleted ", artistToDelete.value);
   isDialogOpen.value = false;
-  paginatedUsers.value = paginatedUsers.value.filter(
-    (u) => u.id !== userToDelete.value
+  paginatedArtists.value = paginatedArtists.value.filter(
+    (u) => u.id !== artistToDelete.value
   );
-  userToDelete.value = null;
-  toast.success("User Deleted");
+  artistToDelete.value = null;
+  toast.success("Artist Deleted");
 };
 </script>
 
 <template>
   <div class="py-8 px-12">
     <span class="mb-6 flex justify-between">
-      <p class="text-2xl font-semibold">Users</p>
-      <router-link to="/users/add"
+      <p class="text-2xl font-semibold">Artists</p>
+      <router-link to="/artists/add"
         ><Button class="text-base py-6 bg-green-700 hover:bg-green-800">
-          Add User <Plus class="ml-1 w-[20px] h-[20px]" /> </Button
+          Add Artist <Plus class="ml-1 w-[20px] h-[20px]" /> </Button
       ></router-link>
     </span>
     <Table>
       <TableHeader class="text-base">
         <TableRow>
           <TableHead class=""> ID </TableHead>
-          <TableHead class="cell-min-width"> First Name </TableHead>
-          <TableHead class="cell-min-width"> Last Name </TableHead>
-          <TableHead class="cell-min-width"> Email </TableHead>
-          <TableHead class="cell-min-width"> Phone </TableHead>
+          <TableHead class="cell-min-width"> Name </TableHead>
           <TableHead class="cell-min-width"> DOB </TableHead>
           <TableHead class="cell-min-width"> Gender </TableHead>
           <TableHead class="cell-min-width"> Address </TableHead>
+          <TableHead class="cell-min-width"> First Release Year </TableHead>
+          <TableHead class="cell-min-width"> Albums Released </TableHead>
           <TableHead class="cell-min-width"> </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow v-for="user in paginatedUsers" :key="user.id">
+        <TableRow v-for="artist in paginatedArtists" :key="artist.id">
           <TableCell class="font-medium">
-            {{ user.id }}
+            {{ artist.id }}
           </TableCell>
-          <TableCell>{{ user.first_name }}</TableCell>
-          <TableCell>{{ user.last_name }}</TableCell>
-          <TableCell>{{ user.email }}</TableCell>
-          <TableCell>{{ user.phone }}</TableCell>
-          <TableCell>{{ user.dob }}</TableCell>
-          <TableCell>{{ displayGender(user.gender) }}</TableCell>
-          <TableCell>{{ user.address }}</TableCell>
+          <TableCell>{{ artist.name }}</TableCell>
+          <TableCell>{{ artist.dob }}</TableCell>
+          <TableCell>{{ displayGender(artist.gender) }}</TableCell>
+          <TableCell>{{ artist.address }}</TableCell>
+          <TableCell>{{ artist.first_release_year }}</TableCell>
+          <TableCell>{{ artist.no_of_albums_released }}</TableCell>
           <TableCell>
-            <router-link to="/users/edit"
+            <RouterLink :to="`/artists/${artist.id}/songs`"
+              ><Button variant="outline" type="button"> Songs </Button>
+            </RouterLink>
+            <router-link to="/artists/edit"
               ><Button class="bg-blue-800 hover:bg-blue-900 mr-2"
                 >Edit</Button
               ></router-link
             >
             <Dialog
-              :open="isDialogOpen && userToDelete === user.id"
+              :open="isDialogOpen && artistToDelete === artist.id"
               :modal="true"
             >
               <DialogTrigger as-child>
                 <Button
                   class="bg-red-700 hover:bg-red-800"
-                  @click="openDialog(user.id)"
+                  @click="openDialog(artist.id)"
                   >Delete</Button
                 > </DialogTrigger
               ><DialogContent class="sm:max-w-md p-8">
                 <DialogHeader>
                   <DialogTitle class="my-4">
-                    Are you sure you want to delete the user?
+                    Are you sure you want to delete the artist?
                   </DialogTitle>
                   <DialogDescription />
                 </DialogHeader>
@@ -275,7 +254,7 @@ const deleteUser = () => {
                     >
                       No
                     </Button>
-                    <Button type="button" @click="deleteUser"> Yes </Button>
+                    <Button type="button" @click="deleteArtist"> Yes </Button>
                   </DialogClose>
                 </DialogFooter>
               </DialogContent>
@@ -287,7 +266,7 @@ const deleteUser = () => {
 
     <Pagination
       v-slot="{ page }"
-      :total="totalUsers"
+      :total="totalArtists"
       :itemsPerPage="10"
       :sibling-count="1"
       show-edges

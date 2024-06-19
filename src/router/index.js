@@ -12,6 +12,7 @@ import EditArtistView from "../views/EditArtistView.vue";
 import EditSongView from "../views/EditSongView.vue";
 import SongsView from "../views/SongsView.vue";
 import LogoutView from "../views/LogoutView.vue";
+import { useUserStore } from "../stores/user";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,11 +33,11 @@ const router = createRouter({
       path: "/home",
       name: "home",
       component: DashboardView,
-      meta: { requiresNavbar: true },
+      meta: { requiresNavbar: true, requiresAuth: true },
     },
     {
       path: "/users",
-      meta: { requiresNavbar: true },
+      meta: { requiresNavbar: true, requiresAuth: true },
       children: [
         {
           path: "",
@@ -54,7 +55,7 @@ const router = createRouter({
     },
     {
       path: "/artists",
-      meta: { requiresNavbar: true },
+      meta: { requiresNavbar: true, requiresAuth: true },
       children: [
         {
           path: "",
@@ -91,9 +92,22 @@ const router = createRouter({
       path: "/logout",
       name: "logout",
       component: LogoutView,
-      meta: { requiresNavbar: false },
+      meta: { requiresNavbar: false, requiresAuth: true },
     },
   ],
+});
+
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore();
+  userStore.initUser();
+  console.log(userStore.user);
+  if (to.meta.requiresAuth && !userStore.user) {
+    next({ name: "login" });
+  } else if (userStore.user && to.name === "login") {
+    next({ name: "home" });
+  } else {
+    next();
+  }
 });
 
 export default router;

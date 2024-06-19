@@ -45,9 +45,11 @@ const fetchData = async () => {
     totalUsers.value = response.data.total;
   } catch (error) {
     console.error("Error fetching data:", error);
-    error.response
-      ? toast.error(error.response.data.error)
-      : toast.error(error.message);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
   }
 };
 

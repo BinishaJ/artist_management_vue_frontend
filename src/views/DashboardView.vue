@@ -1,5 +1,35 @@
 <script setup>
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import axiosInstance from "../axios/axios";
+import { ref, onMounted } from "vue";
+
+const totalUsers = ref(null);
+const totalArtists = ref(null);
+const totalSongs = ref(null);
+
+const getData = async () => {
+  try {
+    let response = await axiosInstance.get("/users/count");
+    totalUsers.value = response.data.data;
+
+    response = await axiosInstance.get("/artists/count");
+    totalArtists.value = response.data.data;
+
+    response = await axiosInstance.get("/musics/count");
+    totalSongs.value = response.data.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
+};
+
+onMounted(() => {
+  getData();
+});
 </script>
 
 <template>
@@ -28,7 +58,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
       </CardHeader>
       <CardContent>
         <div class="text-2xl font-medium flex items-center">
-          <p>10</p>
+          <p>{{ totalUsers }}</p>
         </div>
       </CardContent>
     </Card>
@@ -66,7 +96,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
       </CardHeader>
       <CardContent>
         <div class="text-2xl font-medium flex items-center">
-          <p>10</p>
+          <p>{{ totalArtists }}</p>
         </div>
       </CardContent> </Card
     ><Card class="p-7 bg-[#fde4c3]">
@@ -93,7 +123,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
       </CardHeader>
       <CardContent>
         <div class="text-2xl font-medium flex items-center">
-          <p>10</p>
+          <p>{{ totalSongs }}</p>
         </div>
       </CardContent>
     </Card>

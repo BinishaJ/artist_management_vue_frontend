@@ -14,13 +14,44 @@ import {
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-vue-next";
 import { ref } from "vue";
+import axiosInstance from "../axios/axios";
+import { useToast } from "vue-toastification";
+import { useRouter } from "vue-router";
 
 import loginCover from "@/assets/images/login-cover.webp";
 
+const router = useRouter();
+const toast = useToast();
 let showPassword = ref(false);
 
 const email = ref("");
 const password = ref("");
+
+const postData = async () => {
+  try {
+    const response = await axiosInstance.post("/login", {
+      email: email.value,
+      password: password.value,
+    });
+
+    email.value = "";
+    password.value = "";
+
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("role_id", response.data.role_id);
+
+    router.push({ path: "/home" });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    password.value = "";
+
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
+};
 
 const showPasswordField = () => {
   showPassword.value = !showPassword.value;
@@ -37,8 +68,9 @@ const form = useForm({
   validationSchema: formSchema,
 });
 
-const onSubmit = form.handleSubmit((values) => {
+const onSubmit = form.handleSubmit(async (values) => {
   console.log("Form submitted!", values);
+  await postData(values);
 });
 </script>
 

@@ -44,9 +44,11 @@ import {
   today,
 } from "@internationalized/date";
 import { useToast } from "vue-toastification";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
+import axiosInstance from "../axios/axios";
 
 const router = useRouter();
+const route = useRoute();
 const toast = useToast();
 
 const props = defineProps({
@@ -71,9 +73,15 @@ const props = defineProps({
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      required: true,
+    },
   },
   user: Object,
 });
+
+const userType = props.details.type;
 
 const df = new DateFormatter("en-US", {
   dateStyle: "long",
@@ -88,6 +96,7 @@ const initialState = {
   dob: "",
   gender: "",
   address: "",
+  role_id: "",
 };
 
 const data = reactive({ ...initialState, ...props.user });
@@ -119,6 +128,7 @@ const formSchema = toTypedSchema(
     dob: z.string().date().optional().or(z.literal("")),
     gender: z.string().optional().or(z.literal("")),
     address: z.string().optional().or(z.literal("")),
+    role_id: z.string().optional(),
   })
 );
 
@@ -127,14 +137,35 @@ const { handleSubmit, setFieldValue, values } = useForm({
   initialValues: data,
 });
 
-const onSubmit = handleSubmit((values) => {
+const postData = async () => {
+  try {
+    console.log(data);
+    if (data.role_id) data.role_id = +data.role_id;
+    else data.role_id = 3;
+
+    if (userType == "update")
+      await axiosInstance.patch(`/users/${route.params.id}`, data);
+    else await axiosInstance.post("/users", data);
+
+    Object.assign(data, initialState);
+    toast.success(props.details.toast, {
+      onClose: () => {
+        router.push({ path: props.details.redirect });
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
+};
+
+const onSubmit = handleSubmit(async (values) => {
   console.log("Form submitted!", values);
-  Object.assign(data, initialState);
-  toast.success(props.details.toast, {
-    onClose: () => {
-      router.push({ path: props.details.redirect });
-    },
-  });
+  await postData();
 });
 </script>
 
@@ -316,6 +347,33 @@ const onSubmit = handleSubmit((values) => {
                   v-bind="componentField"
                   v-model="data.address"
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="role_id">
+            <FormItem class="label_margin">
+              <FormLabel class="text-inherit text-base">Role</FormLabel>
+              <FormControl>
+                <Select
+                  v-bind="componentField"
+                  id="role_id"
+                  v-model="data.role_id"
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="1"> Admin </SelectItem>
+                      <SelectItem value="2"> Artist Manager </SelectItem>
+                      <SelectItem value="3"> Artist </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>

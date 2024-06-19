@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-vue-next";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import {
   Dialog,
   DialogClose,
@@ -29,163 +29,52 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useToast } from "vue-toastification";
+import axiosInstance from "../axios/axios";
 
 const toast = useToast();
 
-const users = ref([
-  {
-    id: 1,
-    first_name: "First",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-  },
-  {
-    id: 2,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "f",
-    address: "Address",
-  },
-  {
-    id: 3,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-  },
-  {
-    id: 4,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-  },
-  {
-    id: 5,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "f",
-    address: "Address",
-  },
-  {
-    id: 6,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "o",
-    address: "Address",
-  },
-  {
-    id: 7,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-  },
-  {
-    id: 8,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-  },
-  {
-    id: 9,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "o",
-    address: "Address",
-  },
-  {
-    id: 10,
-    first_name: "Ten",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "o",
-    address: "Address",
-  },
-  {
-    id: 11,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "o",
-    address: "Address",
-  },
-  {
-    id: 12,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "o",
-    address: "Address",
-  },
-  {
-    id: 13,
-    first_name: "ABC",
-    last_name: "Last",
-    email: "abc@gmail.com",
-    phone: "988745510",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-  },
-]);
+const users = ref([]);
+const isDialogOpen = ref(false);
+const userToDelete = ref(null);
+const totalUsers = ref(null);
 
-const totalUsers = users.value.length;
+const fetchData = async () => {
+  try {
+    const response = await axiosInstance.get("/users");
+    users.value = response.data.data;
+    totalUsers.value = response.data.total;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    error.response
+      ? toast.error(error.response.data.error)
+      : toast.error(error.message);
+  }
+};
 
 const displayGender = (gender) => {
   if (gender === "m") {
     return "Male";
   } else if (gender === "f") {
     return "Female";
-  } else {
+  } else if (gender === "o") {
     return "Others";
   }
 };
 
-const paginatedUsers = ref(users.value.slice(0, 10));
-
-const handlePageChange = (page) => {
-  const max = page === 1 ? 10 : 13;
-  paginatedUsers.value = users.value.slice((page - 1) * 10, max);
+const displayRole = (role_id) => {
+  if (role_id === 1) {
+    return "Admin";
+  } else if (role_id === 2) {
+    return "Artist Manager";
+  } else {
+    return "Artist";
+  }
 };
 
-const isDialogOpen = ref(false);
-const userToDelete = ref(null);
+const handlePageChange = async (page) => {
+  const response = await axiosInstance.get(`/users?page=${page}`);
+  users.value = response.data.data;
+};
 
 const openDialog = (userId) => {
   userToDelete.value = userId;
@@ -197,15 +86,28 @@ const closeDialog = () => {
   userToDelete.value = null;
 };
 
-const deleteUser = () => {
+const deleteUser = async () => {
   console.log("User deleted ", userToDelete.value);
   isDialogOpen.value = false;
-  paginatedUsers.value = paginatedUsers.value.filter(
-    (u) => u.id !== userToDelete.value
-  );
+  try {
+    await axiosInstance.delete(`/users/${userToDelete.value}`);
+    users.value = users.value.filter((u) => u.id !== userToDelete.value);
+
+    toast.success("User Deleted");
+  } catch (error) {
+    console.error("Error deleting:", error);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
   userToDelete.value = null;
-  toast.success("User Deleted");
 };
+
+onMounted(() => {
+  fetchData();
+});
 </script>
 
 <template>
@@ -228,11 +130,12 @@ const deleteUser = () => {
           <TableHead class="cell-min-width"> DOB </TableHead>
           <TableHead class="cell-min-width"> Gender </TableHead>
           <TableHead class="cell-min-width"> Address </TableHead>
+          <TableHead class="cell-min-width"> Role </TableHead>
           <TableHead class="cell-min-width"> </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow v-for="user in paginatedUsers" :key="user.id">
+        <TableRow v-for="user in users" :key="user.id">
           <TableCell class="font-medium">
             {{ user.id }}
           </TableCell>
@@ -243,8 +146,9 @@ const deleteUser = () => {
           <TableCell>{{ user.dob }}</TableCell>
           <TableCell>{{ displayGender(user.gender) }}</TableCell>
           <TableCell>{{ user.address }}</TableCell>
+          <TableCell>{{ displayRole(user.role_id) }}</TableCell>
           <TableCell>
-            <router-link to="/users/edit"
+            <router-link :to="`/users/edit/${user.id}`"
               ><Button class="mb-2 xl:mb-0 bg-blue-800 hover:bg-blue-900 mr-2"
                 >Edit</Button
               ></router-link

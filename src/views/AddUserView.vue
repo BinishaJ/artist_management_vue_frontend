@@ -8,6 +8,7 @@ const details = ref({
   button: "Create",
   toast: "User Created",
   redirect: "/users",
+  type: "new",
 });
 </script>
 

@@ -8,6 +8,7 @@ const details = ref({
   button: "Sign Up",
   toast: "User Registered",
   redirect: "/",
+  type: "register",
 });
 </script>
 

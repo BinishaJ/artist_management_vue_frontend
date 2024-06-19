@@ -16,7 +16,14 @@ import {
   PaginationPrev,
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
-import { Plus, Music2 } from "lucide-vue-next";
+import {
+  Plus,
+  Music2,
+  CloudUpload,
+  CloudDownload,
+  Download,
+  Upload,
+} from "lucide-vue-next";
 import { ref, onMounted } from "vue";
 import {
   Dialog,
@@ -28,8 +35,18 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "vue-toastification";
 import axiosInstance from "../axios/axios";
+
+import { saveAs } from "file-saver";
 
 const toast = useToast();
 
@@ -37,6 +54,10 @@ const artists = ref([]);
 const totalArtists = ref(null);
 const isDialogOpen = ref(false);
 const artistToDelete = ref(null);
+const isImportOpen = ref(false);
+
+const file = ref(null);
+const fileEmpty = ref(false);
 
 const fetchData = async () => {
   try {
@@ -78,6 +99,16 @@ const closeDialog = () => {
   artistToDelete.value = null;
 };
 
+const openImportDialog = () => {
+  isImportOpen.value = true;
+};
+
+const closeImportDialog = () => {
+  isImportOpen.value = false;
+  file.value = null;
+  fileEmpty.value = false;
+};
+
 const deleteArtist = async () => {
   console.log("Artist deleted ", artistToDelete.value);
   isDialogOpen.value = false;
@@ -97,6 +128,64 @@ const deleteArtist = async () => {
   artistToDelete.value = null;
 };
 
+const onFileChange = (event) => {
+  console.log(event);
+  const selectedFile = event.target.files[0];
+  if (selectedFile) {
+    file.value = selectedFile;
+    fileEmpty.value = false;
+  } else {
+    file.value = null;
+    fileEmpty.value = true;
+  }
+};
+
+const handleUpload = async () => {
+  if (!file.value) {
+    fileEmpty.value = true;
+    return;
+  }
+  const formData = new FormData();
+  formData.append("file", file.value);
+
+  try {
+    const response = await axiosInstance.post("/csv", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    console.log("Upload successful:", response.data);
+    toast.success("Upload Successful");
+    closeImportDialog();
+    fetchData();
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
+};
+
+const handleExport = async () => {
+  try {
+    const response = await axiosInstance.get("/csv.csv");
+    console.log(response.data);
+    const blob = new Blob([response.data], { type: "text/csv" });
+
+    saveAs(blob, "artists.csv");
+  } catch (error) {
+    console.error("Error exporting:", error);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
+};
+
 onMounted(() => {
   fetchData();
 });
@@ -106,10 +195,77 @@ onMounted(() => {
   <div class="py-8 px-12">
     <span class="mb-6 flex justify-between">
       <p class="text-2xl font-semibold">Artists</p>
-      <router-link to="/artists/add"
-        ><Button class="text-base py-6 bg-green-700 hover:bg-green-800">
-          Add Artist <Plus class="ml-1 w-[20px] h-[20px]" /> </Button
-      ></router-link>
+      <div>
+        <router-link to="/artists/add" class="mr-4">
+          <Button class="text-base py-6 bg-green-700 hover:bg-green-800">
+            Add Artist <Plus class="ml-1 w-[20px] h-[20px]" />
+          </Button>
+        </router-link>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            ><Button class="text-base py-6 bg-pink-700 hover:bg-pink-800">
+              CSV <CloudDownload class="ml-2 w-[20px] h-[20px]" /> </Button
+          ></DropdownMenuTrigger>
+          <DropdownMenuContent class="p-2">
+            <Dialog :open="isImportOpen" :modal="true">
+              <DialogTrigger as-child>
+                <div
+                  class="flex text-base p-2 hover:cursor-pointer hover:bg-slate-100"
+                  @click="openImportDialog"
+                >
+                  Import<Download
+                    class="ml-3 w-[20px] h-[20px]"
+                  /></div></DialogTrigger
+              ><DialogContent class="sm:max-w-md p-8">
+                <DialogHeader>
+                  <DialogTitle class="my-4"> Import File </DialogTitle>
+                  <DialogDescription />
+                  <Label
+                    class="flex justify-center items-center rounded-xl border-dashed border-blue-700 border-[1px] h-[200px] mb-4"
+                  >
+                    <CloudUpload class="text-blue-800 w-1/3 h-1/4 opacity-70" />
+                  </Label>
+                  <Input
+                    type="file"
+                    accept="text/csv"
+                    class="text-sm"
+                    required
+                    @change="onFileChange"
+                  />
+                  <p
+                    v-if="fileEmpty"
+                    class="text-red-500 self-end font-base my-2"
+                  >
+                    Upload a file!
+                  </p>
+                </DialogHeader>
+                <DialogFooter class="sm:justify-end">
+                  <DialogClose as-child>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      @click="closeImportDialog"
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="button" @click="handleUpload">
+                      Upload
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <DropdownMenuItem
+              class="text-base py-2 hover:cursor-pointer"
+              @click="handleExport"
+            >
+              Export<Upload class="ml-3 w-[20px] h-[20px]" />
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </span>
     <Table>
       <TableHeader class="text-base">

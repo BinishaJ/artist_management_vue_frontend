@@ -30,6 +30,7 @@ import * as z from "zod";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useToast } from "vue-toastification";
 import { useRouter, useRoute } from "vue-router";
+import axiosInstance from "../axios/axios";
 
 const router = useRouter();
 const route = useRoute();
@@ -53,24 +54,33 @@ const props = defineProps({
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      required: true,
+    },
   },
   song: Object,
 });
+
+const songType = props.details.type;
 
 const initialState = {
   title: "",
   album_name: "",
   genre: "",
-  artist_id: route.params.id,
+  artist_id: "",
 };
 
 const data = reactive({ ...initialState, ...props.song });
+
+data["artist_id"] = +route.params.id;
 
 const formSchema = toTypedSchema(
   z.object({
     title: z.string().min(1, { message: "Field is required" }),
     album_name: z.string().min(1, { message: "Field is required" }),
     genre: z.string().min(1, { message: "Field is required" }),
+    artist_id: z.number(),
   })
 );
 
@@ -79,19 +89,39 @@ const { handleSubmit, setFieldValue, values } = useForm({
   initialValues: data,
 });
 
-const onSubmit = handleSubmit((values) => {
+const postData = async (values) => {
+  try {
+    if (songType == "update")
+      await axiosInstance.patch(`/musics/${route.params.song_id}`, values);
+    else await axiosInstance.post("/musics", values);
+
+    Object.assign(data, initialState);
+    toast.success(props.details.toast, {
+      onClose: () => {
+        router.push({ path: "/musics" });
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
+};
+
+const onSubmit = handleSubmit(async (values) => {
   console.log("Form submitted!", values);
-  Object.assign(data, initialState);
-  toast.success(props.details.toast, {
-    onClose: () => {
-      router.push({ path: `/artists/${data.artist_id}/songs` });
-    },
-  });
+  await postData(values);
 });
 </script>
 
 <template>
-  <div class="flex justify-center items-center my-12">
+  <div
+    class="flex justify-center items-center my-12"
+    style="min-height: calc(100vh - 70px - 6rem)"
+  >
     <Card class="w-3/4 md:w-[60%] lg:w-[40%]">
       <form class="space-y-4 p-6" @submit.prevent="onSubmit">
         <CardHeader>

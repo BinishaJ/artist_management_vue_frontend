@@ -1,8 +1,11 @@
 <script setup>
 import Song from "./Song.vue";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import axiosInstance from "../axios/axios";
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
 const route = useRoute();
 
 const details = ref({
@@ -10,16 +13,31 @@ const details = ref({
   description: "",
   button: "Update",
   toast: "Song Updated",
+  type: "update",
 });
 
-const song = ref({
-  id: route.params.song_id,
-  title: "Song 1",
-  album_name: "Album 1",
-  genre: "country",
+const song = ref(null);
+
+const getSong = async () => {
+  try {
+    const response = await axiosInstance.get(`/musics/${route.params.song_id}`);
+    song.value = response.data;
+  } catch (error) {
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
+};
+
+onMounted(() => {
+  getSong();
 });
 </script>
 
 <template>
-  <Song v-bind:details="details" v-bind:song="song" />
+  <div v-if="song">
+    <Song v-bind:details="details" v-bind:song="song" />
+  </div>
 </template>

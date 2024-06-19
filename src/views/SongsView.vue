@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-vue-next";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import {
   Dialog,
   DialogClose,
@@ -22,53 +22,31 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "vue-toastification";
 import { useRoute } from "vue-router";
+import axiosInstance from "../axios/axios";
 
 const route = useRoute();
 const toast = useToast();
 
-const songs = ref([
-  {
-    id: 1,
-    title: "Song 1",
-    album_name: "Album 1",
-    genre: "country",
-  },
-  {
-    id: 2,
-    title: "Song 1",
-    album_name: "Album 1",
-    genre: "rnb",
-  },
-  {
-    id: 3,
-    title: "Song 1",
-    album_name: "Album 1",
-    genre: "rock",
-  },
-  {
-    id: 4,
-    title: "Song 1",
-    album_name: "Album 1",
-    genre: "rock",
-  },
-  {
-    id: 5,
-    title: "Song 1",
-    album_name: "Album 1",
-    genre: "rock",
-  },
-  {
-    id: 6,
-    title: "Song 1",
-    album_name: "Album 1",
-    genre: "rock",
-  },
-]);
+const songs = ref([]);
 
 const artistId = route.params.id;
 
 const isDialogOpen = ref(false);
 const songToDelete = ref(null);
+
+const fetchData = async () => {
+  try {
+    const response = await axiosInstance.get(`/artists/${artistId}/music`);
+    songs.value = response.data.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
+};
 
 const openDialog = (songId) => {
   songToDelete.value = songId;
@@ -80,13 +58,28 @@ const closeDialog = () => {
   songToDelete.value = null;
 };
 
-const deleteSong = () => {
+const deleteSong = async () => {
   console.log("Song deleted ", songToDelete.value);
   isDialogOpen.value = false;
-  songs.value = songs.value.filter((u) => u.id !== songToDelete.value);
+  try {
+    await axiosInstance.delete(`/musics/${songToDelete.value}`);
+    songs.value = songs.value.filter((u) => u.id !== songToDelete.value);
+
+    toast.success("Song Deleted");
+  } catch (error) {
+    console.error("Error deleting:", error);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
   songToDelete.value = null;
-  toast.success("Song Deleted");
 };
+
+onMounted(() => {
+  fetchData();
+});
 </script>
 
 <template>
@@ -108,7 +101,7 @@ const deleteSong = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow v-for="song in songs" :key="song.id">
+        <TableRow v-if="songs.length" v-for="song in songs" :key="song.id">
           <TableCell class="font-medium">
             {{ song.id }}
           </TableCell>
@@ -155,6 +148,11 @@ const deleteSong = () => {
             </Dialog>
           </TableCell>
         </TableRow>
+        <TableRow v-else class="my-6 text-lg font-medium"
+          ><TableCell colspan="4"
+            >Oops! No songs for the artist</TableCell
+          ></TableRow
+        >
       </TableBody>
     </Table>
   </div>

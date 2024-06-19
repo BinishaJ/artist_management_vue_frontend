@@ -2,10 +2,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import axiosInstance from "../axios/axios";
 import { ref, onMounted } from "vue";
+import { useToast } from "vue-toastification";
 
 const totalUsers = ref(null);
 const totalArtists = ref(null);
 const totalSongs = ref(null);
+const toast = useToast();
 
 const getData = async () => {
   try {

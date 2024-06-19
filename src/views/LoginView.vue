@@ -17,6 +17,7 @@ import { ref } from "vue";
 import axiosInstance from "../axios/axios";
 import { useToast } from "vue-toastification";
 import { useRouter } from "vue-router";
+import { useUserStore } from "../stores/user";
 
 import loginCover from "@/assets/images/login-cover.webp";
 
@@ -24,21 +25,17 @@ const router = useRouter();
 const toast = useToast();
 let showPassword = ref(false);
 
+const userStore = useUserStore();
+
 const email = ref("");
 const password = ref("");
 
 const postData = async () => {
   try {
-    const response = await axiosInstance.post("/login", {
-      email: email.value,
-      password: password.value,
-    });
+    await userStore.login(email.value, password.value);
 
     email.value = "";
     password.value = "";
-
-    localStorage.setItem("token", response.data.token);
-    localStorage.setItem("role_id", response.data.role_id);
 
     router.push({ path: "/home" });
   } catch (error) {

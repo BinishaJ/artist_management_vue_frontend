@@ -18,7 +18,6 @@ import {
           :class="navigationMenuTriggerStyle()"
           >Home</NavigationMenuLink
         >
-        <!-- <router-link to="/home" class="nav-menu-items">Home</router-link> -->
       </NavigationMenuItem>
       <NavigationMenuItem>
         <NavigationMenuLink
@@ -27,7 +26,6 @@ import {
           :class="navigationMenuTriggerStyle()"
           >Users</NavigationMenuLink
         >
-        <!-- <router-link to="/users" class="nav-menu-items">Users</router-link> -->
       </NavigationMenuItem>
       <NavigationMenuItem>
         <NavigationMenuLink
@@ -37,12 +35,11 @@ import {
         >
           Artists
         </NavigationMenuLink>
-        <!-- <router-link to="/artists" class="nav-menu-items">Artists</router-link> -->
       </NavigationMenuItem>
       <NavigationMenuItem>
         <NavigationMenuLink
           class="nav-menu-items"
-          href="/"
+          href="/logout"
           :class="navigationMenuTriggerStyle()"
         >
           Logout

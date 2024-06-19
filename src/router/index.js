@@ -11,6 +11,7 @@ import EditUserView from "../views/EditUserView.vue";
 import EditArtistView from "../views/EditArtistView.vue";
 import EditSongView from "../views/EditSongView.vue";
 import SongsView from "../views/SongsView.vue";
+import LogoutView from "../views/LogoutView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -85,6 +86,12 @@ const router = createRouter({
           ],
         },
       ],
+    },
+    {
+      path: "/logout",
+      name: "logout",
+      component: LogoutView,
+      meta: { requiresNavbar: false },
     },
   ],
 });

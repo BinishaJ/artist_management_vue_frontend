@@ -1,17 +1,19 @@
 import { createRouter, createWebHistory } from "vue-router";
-import LoginView from "../views/LoginView.vue";
-import RegisterView from "../views/RegisterView.vue";
-import DashboardView from "../views/DashboardView.vue";
-import UsersView from "../views/UsersView.vue";
-import ArtistsView from "../views/ArtistsView.vue";
-import AddUserView from "../views/AddUserView.vue";
-import AddArtistView from "../views/AddArtistView.vue";
-import AddSongView from "../views/AddSongView.vue";
-import EditUserView from "../views/EditUserView.vue";
-import EditArtistView from "../views/EditArtistView.vue";
-import EditSongView from "../views/EditSongView.vue";
-import SongsView from "../views/SongsView.vue";
-import LogoutView from "../views/LogoutView.vue";
+import {
+  LoginView,
+  RegisterView,
+  DashboardView,
+  UsersView,
+  ArtistsView,
+  AddUserView,
+  AddArtistView,
+  AddSongView,
+  EditUserView,
+  EditArtistView,
+  EditSongView,
+  SongsView,
+  LogoutView,
+} from "../views";
 import { useUserStore } from "../stores/user";
 
 const router = createRouter({

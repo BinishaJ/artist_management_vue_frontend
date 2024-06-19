@@ -7,6 +7,7 @@ const details = ref({
   description: "Enter the details",
   button: "Create",
   toast: "Artist Created",
+  type: "new",
 });
 </script>
 

@@ -44,9 +44,11 @@ import {
   today,
 } from "@internationalized/date";
 import { useToast } from "vue-toastification";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
+import axiosInstance from "../axios/axios";
 
 const router = useRouter();
+const route = useRoute();
 const toast = useToast();
 
 const props = defineProps({
@@ -67,9 +69,15 @@ const props = defineProps({
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      required: true,
+    },
   },
   artist: Object,
 });
+
+const artistType = props.details.type;
 
 const df = new DateFormatter("en-US", {
   dateStyle: "long",
@@ -99,8 +107,10 @@ const formSchema = toTypedSchema(
     address: z.string().min(1, { message: "Field is required" }),
     first_release_year: z
       .number({ message: "Field is required" })
-      .min(1950)
-      .max(new Date().getFullYear()),
+      .min(1950, { message: "Release year can't be smaller than 1950" })
+      .max(new Date().getFullYear(), {
+        message: "Release year can't be greater than current year",
+      }),
     no_of_albums_released: z.number({ message: "Field is required" }).min(0),
   })
 );
@@ -110,14 +120,31 @@ const { handleSubmit, setFieldValue, values } = useForm({
   initialValues: data,
 });
 
-const onSubmit = handleSubmit((values) => {
+const postData = async (values) => {
+  try {
+    if (artistType == "update")
+      await axiosInstance.patch(`/artists/${route.params.id}`, values);
+    else await axiosInstance.post("/artists", values);
+
+    Object.assign(data, initialState);
+    toast.success(props.details.toast, {
+      onClose: () => {
+        router.push({ path: "/artists" });
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
+};
+
+const onSubmit = handleSubmit(async (values) => {
   console.log("Form submitted!", values);
-  Object.assign(data, initialState);
-  toast.success(props.details.toast, {
-    onClose: () => {
-      router.push({ path: "/artists" });
-    },
-  });
+  await postData(values);
 });
 </script>
 

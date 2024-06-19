@@ -137,15 +137,14 @@ const { handleSubmit, setFieldValue, values } = useForm({
   initialValues: data,
 });
 
-const postData = async () => {
+const postData = async (values) => {
   try {
-    console.log(data);
-    if (data.role_id) data.role_id = +data.role_id;
-    else data.role_id = 3;
+    if (values.role_id) values.role_id = +values.role_id;
+    else values.role_id = 3;
 
     if (userType == "update")
-      await axiosInstance.patch(`/users/${route.params.id}`, data);
-    else await axiosInstance.post("/users", data);
+      await axiosInstance.patch(`/users/${route.params.id}`, values);
+    else await axiosInstance.post("/users", values);
 
     Object.assign(data, initialState);
     toast.success(props.details.toast, {
@@ -165,7 +164,7 @@ const postData = async () => {
 
 const onSubmit = handleSubmit(async (values) => {
   console.log("Form submitted!", values);
-  await postData();
+  await postData(values);
 });
 </script>
 

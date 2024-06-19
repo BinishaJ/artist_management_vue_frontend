@@ -150,7 +150,7 @@ onMounted(() => {
           <TableCell>{{ user.address }}</TableCell>
           <TableCell>{{ displayRole(user.role_id) }}</TableCell>
           <TableCell>
-            <router-link :to="`/users/edit/${user.id}`"
+            <router-link :to="`/users/${user.id}/edit`"
               ><Button class="mb-2 xl:mb-0 bg-blue-800 hover:bg-blue-900 mr-2"
                 >Edit</Button
               ></router-link

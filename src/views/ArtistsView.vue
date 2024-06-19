@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Plus, Music2 } from "lucide-vue-next";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import {
   Dialog,
   DialogClose,
@@ -29,121 +29,29 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useToast } from "vue-toastification";
+import axiosInstance from "../axios/axios";
 
 const toast = useToast();
 
-const artists = ref([
-  {
-    id: 1,
-    name: "First",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-    first_release_year: 2013,
-    no_of_albums_released: 10,
-  },
-  {
-    id: 2,
-    name: "Last",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-    first_release_year: 2013,
-    no_of_albums_released: 10,
-  },
-  {
-    id: 3,
-    name: "ABC",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-    first_release_year: 2011,
-    no_of_albums_released: 3,
-  },
-  {
-    id: 4,
-    name: "First",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-    first_release_year: 2013,
-    no_of_albums_released: 10,
-  },
-  {
-    id: 5,
-    name: "First",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-    first_release_year: 2013,
-    no_of_albums_released: 10,
-  },
-  {
-    id: 6,
-    name: "First",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-    first_release_year: 2013,
-    no_of_albums_released: 10,
-  },
-  {
-    id: 7,
-    name: "First",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-    first_release_year: 2013,
-    no_of_albums_released: 10,
-  },
-  {
-    id: 8,
-    name: "First",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-    first_release_year: 2013,
-    no_of_albums_released: 10,
-  },
-  {
-    id: 9,
-    name: "First",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-    first_release_year: 2013,
-    no_of_albums_released: 10,
-  },
-  {
-    id: 10,
-    name: "XYZ",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-    first_release_year: 2013,
-    no_of_albums_released: 10,
-  },
-  {
-    id: 11,
-    name: "Hi",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-    first_release_year: 2013,
-    no_of_albums_released: 10,
-  },
-  {
-    id: 12,
-    name: "bpa",
-    dob: "2021-02-14",
-    gender: "m",
-    address: "Address",
-    first_release_year: 2013,
-    no_of_albums_released: 10,
-  },
-]);
+const artists = ref([]);
+const totalArtists = ref(null);
+const isDialogOpen = ref(false);
+const artistToDelete = ref(null);
 
-const totalArtists = artists.value.length;
+const fetchData = async () => {
+  try {
+    const response = await axiosInstance.get("/artists");
+    artists.value = response.data.data;
+    totalArtists.value = response.data.total;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
+};
 
 const displayGender = (gender) => {
   if (gender === "m") {
@@ -155,15 +63,10 @@ const displayGender = (gender) => {
   }
 };
 
-const paginatedArtists = ref(artists.value.slice(0, 10));
-
-const handlePageChange = (page) => {
-  const max = page === 1 ? 10 : 13;
-  paginatedArtists.value = artists.value.slice((page - 1) * 10, max);
+const handlePageChange = async (page) => {
+  const response = await axiosInstance.get(`/artists?page=${page}`);
+  artists.value = response.data.data;
 };
-
-const isDialogOpen = ref(false);
-const artistToDelete = ref(null);
 
 const openDialog = (artistId) => {
   artistToDelete.value = artistId;
@@ -175,15 +78,28 @@ const closeDialog = () => {
   artistToDelete.value = null;
 };
 
-const deleteArtist = () => {
+const deleteArtist = async () => {
   console.log("Artist deleted ", artistToDelete.value);
   isDialogOpen.value = false;
-  paginatedArtists.value = paginatedArtists.value.filter(
-    (u) => u.id !== artistToDelete.value
-  );
+  try {
+    await axiosInstance.delete(`/artists/${artistToDelete.value}`);
+    artists.value = artists.value.filter((u) => u.id !== artistToDelete.value);
+
+    toast.success("Artist Deleted");
+  } catch (error) {
+    console.error("Error deleting:", error);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
   artistToDelete.value = null;
-  toast.success("Artist Deleted");
 };
+
+onMounted(() => {
+  fetchData();
+});
 </script>
 
 <template>
@@ -209,7 +125,7 @@ const deleteArtist = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow v-for="artist in paginatedArtists" :key="artist.id">
+        <TableRow v-for="artist in artists" :key="artist.id">
           <TableCell class="font-medium">
             {{ artist.id }}
           </TableCell>
@@ -228,7 +144,7 @@ const deleteArtist = () => {
                 <Music2 stroke-width="3" class="text-[yellow]" />
               </Button>
             </RouterLink>
-            <router-link to="/artists/edit"
+            <router-link :to="`/artists/${artist.id}/edit`"
               ><Button class="mb-2 xl:mb-0 bg-blue-800 hover:bg-blue-900 mr-2"
                 >Edit</Button
               ></router-link

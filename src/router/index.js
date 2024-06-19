@@ -46,7 +46,7 @@ const router = createRouter({
           component: AddUserView,
         },
         {
-          path: "edit/:id",
+          path: ":id/edit",
           component: EditUserView,
         },
       ],
@@ -64,7 +64,7 @@ const router = createRouter({
           component: AddArtistView,
         },
         {
-          path: "edit",
+          path: ":id/edit",
           component: EditArtistView,
         },
         {

@@ -368,8 +368,18 @@ const onSubmit = handleSubmit(async (values) => {
                   <SelectContent>
                     <SelectGroup>
                       <SelectItem value="1"> Admin </SelectItem>
-                      <SelectItem value="2"> Artist Manager </SelectItem>
-                      <SelectItem value="3"> Artist </SelectItem>
+                      <SelectItem
+                        v-if="props.details.type !== 'register'"
+                        value="2"
+                      >
+                        Artist Manager
+                      </SelectItem>
+                      <SelectItem
+                        v-if="props.details.type !== 'register'"
+                        value="3"
+                      >
+                        Artist
+                      </SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>

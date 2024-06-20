@@ -1,6 +1,6 @@
 <script setup>
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import axiosInstance from "../axios/axios";
+import { axiosInstance } from "../axios/axios";
 import { ref, onMounted } from "vue";
 import { useToast } from "vue-toastification";
 

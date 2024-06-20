@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-vue-next";
 import { ref } from "vue";
-import axiosInstance from "../axios/axios";
+import { axiosInstance } from "../axios/axios";
 import { useToast } from "vue-toastification";
 import { useRouter } from "vue-router";
 import { useUserStore } from "../stores/user";

@@ -1,7 +1,8 @@
 <script setup>
 import Navbar from "./views/Navbar.vue";
 import { useRoute } from "vue-router";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
+import { setupInterceptors } from "./axios/axios";
 
 const route = useRoute();
 const shouldShowNavbar = ref(false);
@@ -13,6 +14,10 @@ watch(
   },
   { immediate: true }
 );
+
+onMounted(() => {
+  setupInterceptors();
+});
 </script>
 
 <template>

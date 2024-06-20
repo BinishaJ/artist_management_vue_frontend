@@ -6,6 +6,17 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { useUserStore } from "../stores/user";
+
+const role_id = useUserStore().user.role_id;
+
+const isAdmin = () => {
+  return role_id === 1;
+};
+
+const isArtist = () => {
+  return role_id === 3;
+};
 </script>
 
 <template>
@@ -19,16 +30,20 @@ import {
           >Home</NavigationMenuLink
         >
       </NavigationMenuItem>
+
       <NavigationMenuItem>
         <NavigationMenuLink
+          v-if="isAdmin()"
           href="/users"
           class="nav-menu-items"
           :class="navigationMenuTriggerStyle()"
           >Users</NavigationMenuLink
         >
       </NavigationMenuItem>
+
       <NavigationMenuItem>
         <NavigationMenuLink
+          v-if="!isArtist()"
           href="/artists"
           class="nav-menu-items"
           :class="navigationMenuTriggerStyle()"
@@ -36,6 +51,18 @@ import {
           Artists
         </NavigationMenuLink>
       </NavigationMenuItem>
+
+      <NavigationMenuItem>
+        <NavigationMenuLink
+          v-if="isArtist()"
+          href="/songs"
+          class="nav-menu-items"
+          :class="navigationMenuTriggerStyle()"
+        >
+          Songs
+        </NavigationMenuLink>
+      </NavigationMenuItem>
+
       <NavigationMenuItem>
         <NavigationMenuLink
           class="nav-menu-items"

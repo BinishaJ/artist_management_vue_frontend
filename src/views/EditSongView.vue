@@ -20,8 +20,9 @@ const song = ref(null);
 
 const getSong = async () => {
   try {
-    const response = await axiosInstance.get(`/musics/${route.params.song_id}`);
+    const response = await axiosInstance.get(`/musics/${route.params.id}`);
     song.value = response.data;
+    song.value.artist_id = String(song.value.artist_id);
   } catch (error) {
     if (error.response) {
       if (typeof error.response.data.error === "string")

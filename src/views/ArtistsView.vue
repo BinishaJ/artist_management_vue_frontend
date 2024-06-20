@@ -45,19 +45,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "vue-toastification";
 import { axiosInstance } from "../axios/axios";
-
 import { saveAs } from "file-saver";
+import { useUserStore } from "../stores/user";
 
 const toast = useToast();
+const role_id = useUserStore().user.role_id;
 
 const artists = ref([]);
 const totalArtists = ref(null);
 const isDialogOpen = ref(false);
 const artistToDelete = ref(null);
 const isImportOpen = ref(false);
-
 const file = ref(null);
 const fileEmpty = ref(false);
+
+const isArtistManager = () => {
+  return role_id === 2;
+};
 
 const fetchData = async () => {
   try {
@@ -196,13 +200,13 @@ onMounted(() => {
     <span class="mb-6 flex justify-between">
       <p class="text-2xl font-semibold">Artists</p>
       <div>
-        <router-link to="/artists/add" class="mr-4">
+        <router-link v-if="isArtistManager()" to="/artists/add" class="mr-4">
           <Button class="text-base py-6 bg-green-700 hover:bg-green-800">
             Add Artist <Plus class="ml-1 w-[20px] h-[20px]" />
           </Button>
         </router-link>
 
-        <DropdownMenu>
+        <DropdownMenu v-if="isArtistManager()">
           <DropdownMenuTrigger
             ><Button class="text-base py-6 bg-pink-700 hover:bg-pink-800">
               CSV <CloudDownload class="ml-2 w-[20px] h-[20px]" /> </Button
@@ -300,12 +304,15 @@ onMounted(() => {
                 <Music2 stroke-width="3" class="text-[yellow]" />
               </Button>
             </RouterLink>
-            <router-link :to="`/artists/${artist.id}/edit`"
+            <router-link
+              v-if="isArtistManager()"
+              :to="`/artists/${artist.id}/edit`"
               ><Button class="mb-2 xl:mb-0 bg-blue-800 hover:bg-blue-900 mr-2"
                 >Edit</Button
               ></router-link
             >
             <Dialog
+              v-if="isArtistManager()"
               :open="isDialogOpen && artistToDelete === artist.id"
               :modal="true"
             >

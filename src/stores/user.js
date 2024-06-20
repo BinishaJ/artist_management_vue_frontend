@@ -21,7 +21,7 @@ export const useUserStore = defineStore("user", {
 
     initUser() {
       const token = localStorage.getItem("token");
-      const role_id = localStorage.getItem("role_id");
+      const role_id = +localStorage.getItem("role_id");
       if (token) {
         this.user = {
           token,

@@ -12,7 +12,7 @@ const logout = async () => {
 logout();
 setTimeout(() => {
   router.push({ path: "/" });
-}, 2000);
+}, 1000);
 </script>
 
 <template>Logging Out...</template>

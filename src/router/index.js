@@ -23,23 +23,31 @@ const router = createRouter({
       path: "/",
       name: "login",
       component: LoginView,
-      meta: { requiresNavbar: false },
+      meta: { requiresNavbar: false, requiresAuth: false },
     },
     {
       path: "/register",
       name: "register",
       component: RegisterView,
-      meta: { requiresNavbar: false },
+      meta: { requiresNavbar: false, requiresAuth: false },
     },
     {
       path: "/home",
       name: "home",
       component: DashboardView,
-      meta: { requiresNavbar: true, requiresAuth: true },
+      meta: {
+        requiresNavbar: true,
+        requiresAuth: true,
+        requiredRoles: [1, 2, 3],
+      },
     },
     {
       path: "/users",
-      meta: { requiresNavbar: true, requiresAuth: true },
+      meta: {
+        requiresNavbar: true,
+        requiresAuth: true,
+        requiredRoles: [1],
+      },
       children: [
         {
           path: "",
@@ -62,14 +70,17 @@ const router = createRouter({
         {
           path: "",
           component: ArtistsView,
+          meta: { requiredRoles: [1, 2] },
         },
         {
           path: "add",
           component: AddArtistView,
+          meta: { requiredRoles: [2] },
         },
         {
           path: ":id/edit",
           component: EditArtistView,
+          meta: { requiredRoles: [2] },
         },
         {
           path: ":id/songs",
@@ -77,16 +88,35 @@ const router = createRouter({
             {
               path: "",
               component: SongsView,
-            },
-            {
-              path: "add",
-              component: AddSongView,
-            },
-            {
-              path: ":song_id/edit",
-              component: EditSongView,
+              meta: { requiredRoles: [1, 2] },
             },
           ],
+        },
+      ],
+    },
+    {
+      path: "/songs",
+      meta: {
+        requiresNavbar: true,
+        requiresAuth: true,
+        requiredRoles: [3],
+      },
+      children: [
+        {
+          path: "",
+          component: SongsView,
+          meta: { requiredRoles: [3] },
+        },
+        {
+          path: "add",
+          component: AddSongView,
+          meta: { requiredRoles: [3] },
+        },
+
+        {
+          path: ":id/edit",
+          component: EditSongView,
+          meta: { requiredRoles: [3] },
         },
       ],
     },
@@ -102,10 +132,15 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
   userStore.initUser();
-  console.log(userStore.user);
+
   if (to.meta.requiresAuth && !userStore.user) {
     next({ name: "login" });
   } else if (userStore.user && to.name === "login") {
+    next({ name: "home" });
+  } else if (
+    to.meta.requiredRoles &&
+    !to.meta.requiredRoles.includes(userStore.user?.role_id)
+  ) {
     next({ name: "home" });
   } else {
     next();

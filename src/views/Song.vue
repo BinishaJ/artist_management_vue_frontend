@@ -25,7 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { reactive, defineProps } from "vue";
+import { reactive, defineProps, onMounted, ref } from "vue";
 import * as z from "zod";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useToast } from "vue-toastification";
@@ -72,15 +72,14 @@ const initialState = {
 };
 
 const data = reactive({ ...initialState, ...props.song });
-
-data["artist_id"] = +route.params.id;
+const artists = ref([]);
 
 const formSchema = toTypedSchema(
   z.object({
     title: z.string().min(1, { message: "Field is required" }),
     album_name: z.string().min(1, { message: "Field is required" }),
     genre: z.string().min(1, { message: "Field is required" }),
-    artist_id: z.number(),
+    artist_id: z.string().min(1, { message: "Field is required" }),
   })
 );
 
@@ -91,14 +90,15 @@ const { handleSubmit, setFieldValue, values } = useForm({
 
 const postData = async (values) => {
   try {
+    values.artist_id = +values.artist_id;
     if (songType == "update")
-      await axiosInstance.patch(`/musics/${route.params.song_id}`, values);
+      await axiosInstance.patch(`/musics/${route.params.id}`, values);
     else await axiosInstance.post("/musics", values);
 
     Object.assign(data, initialState);
     toast.success(props.details.toast, {
       onClose: () => {
-        router.push({ path: "/musics" });
+        router.push({ path: "/songs" });
       },
     });
   } catch (error) {
@@ -115,6 +115,24 @@ const onSubmit = handleSubmit(async (values) => {
   console.log("Form submitted!", values);
   await postData(values);
 });
+
+const fetchArtists = async () => {
+  try {
+    const response = await axiosInstance.get(`/artists/all`);
+    artists.value = response.data.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    if (error.response) {
+      if (typeof error.response.data.error === "string")
+        toast.error(error.response.data.error);
+      else toast.error(error.response.data.error[0]);
+    } else toast.error(error.message);
+  }
+};
+
+onMounted(() => {
+  fetchArtists();
+});
 </script>
 
 <template>
@@ -129,6 +147,38 @@ const onSubmit = handleSubmit(async (values) => {
           <CardDescription>{{ props.details.description }}</CardDescription>
         </CardHeader>
         <CardContent>
+          <FormField v-slot="{ componentField }" name="artist_id">
+            <FormItem class="label_margin">
+              <FormLabel class="text-inherit text-base">Artist</FormLabel>
+              <FormControl>
+                <Select
+                  v-bind="componentField"
+                  id="artist_id"
+                  v-model="data.artist_id"
+                  :disabled="props.details.type === 'update'"
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem
+                        v-for="artist in artists"
+                        :key="artist.id"
+                        :value="`${artist.id}`"
+                      >
+                        {{ artist.name }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
           <FormField v-slot="{ componentField }" name="title">
             <FormItem class="label_margin">
               <FormLabel class="text-inherit text-base">Title</FormLabel>
@@ -183,7 +233,7 @@ const onSubmit = handleSubmit(async (values) => {
           </FormField>
         </CardContent>
         <CardFooter class="flex justify-between px-6 pb-6">
-          <RouterLink :to="`/artists/${data.artist_id}/songs`"
+          <RouterLink :to="`/songs`"
             ><Button variant="outline" type="button"> Cancel </Button>
           </RouterLink>
           <Button type="submit">{{ props.details.button }}</Button>

@@ -127,6 +127,7 @@ const postData = async (values) => {
     else await axiosInstance.post("/artists", values);
 
     Object.assign(data, initialState);
+    setFieldValue("dob", undefined);
     toast.success(props.details.toast, {
       onClose: () => {
         router.push({ path: "/artists" });

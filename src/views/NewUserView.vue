@@ -101,6 +101,8 @@ const initialState = {
 
 const data = reactive({ ...initialState, ...props.user });
 
+if (userType === "register") data.role_id = "1";
+
 let showPassword = ref(false);
 
 const showPasswordField = () => {
@@ -142,11 +144,15 @@ const postData = async (values) => {
     if (values.role_id) values.role_id = +values.role_id;
     else values.role_id = 3;
 
-    if (userType == "update")
+    if (userType === "update")
       await axiosInstance.patch(`/users/${route.params.id}`, values);
+    else if (userType === "register")
+      await axiosInstance.post("/register", values);
     else await axiosInstance.post("/users", values);
 
     Object.assign(data, initialState);
+    setFieldValue("dob", undefined);
+
     toast.success(props.details.toast, {
       onClose: () => {
         router.push({ path: props.details.redirect });
@@ -368,16 +374,10 @@ const onSubmit = handleSubmit(async (values) => {
                   <SelectContent>
                     <SelectGroup>
                       <SelectItem value="1"> Admin </SelectItem>
-                      <SelectItem
-                        v-if="props.details.type !== 'register'"
-                        value="2"
-                      >
+                      <SelectItem v-if="userType !== 'register'" value="2">
                         Artist Manager
                       </SelectItem>
-                      <SelectItem
-                        v-if="props.details.type !== 'register'"
-                        value="3"
-                      >
+                      <SelectItem v-if="userType !== 'register'" value="3">
                         Artist
                       </SelectItem>
                     </SelectGroup>

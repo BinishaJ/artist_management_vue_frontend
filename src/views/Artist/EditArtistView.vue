@@ -1,7 +1,7 @@
 <script setup>
 import Artist from "./Artist.vue";
 import { ref, onMounted } from "vue";
-import { axiosInstance } from "../axios/axios";
+import { axiosInstance } from "../../axios/axios";
 import { useRoute } from "vue-router";
 import { useToast } from "vue-toastification";
 

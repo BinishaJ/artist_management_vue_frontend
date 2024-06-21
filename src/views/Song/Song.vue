@@ -30,7 +30,7 @@ import * as z from "zod";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useToast } from "vue-toastification";
 import { useRouter, useRoute } from "vue-router";
-import { axiosInstance } from "../axios/axios";
+import { axiosInstance } from "../../axios/axios";
 
 const router = useRouter();
 const route = useRoute();

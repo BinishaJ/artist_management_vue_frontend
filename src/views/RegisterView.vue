@@ -1,5 +1,5 @@
 <script setup>
-import NewUserView from "./NewUserView.vue";
+import NewUserView from "./User/NewUserView.vue";
 import { ref } from "vue";
 
 const details = ref({

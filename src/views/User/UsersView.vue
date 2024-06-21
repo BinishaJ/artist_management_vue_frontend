@@ -29,7 +29,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useToast } from "vue-toastification";
-import { axiosInstance } from "../axios/axios";
+import { axiosInstance } from "../../axios/axios";
 
 const toast = useToast();
 

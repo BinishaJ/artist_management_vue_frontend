@@ -22,8 +22,8 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "vue-toastification";
 import { useRoute } from "vue-router";
-import { axiosInstance } from "../axios/axios";
-import { useUserStore } from "../stores/user";
+import { axiosInstance } from "../../axios/axios";
+import { useUserStore } from "../../stores/user";
 
 const route = useRoute();
 const toast = useToast();

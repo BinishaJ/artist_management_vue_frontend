@@ -2,7 +2,7 @@
 import Song from "./Song.vue";
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { axiosInstance } from "../axios/axios";
+import { axiosInstance } from "../../axios/axios";
 import { useToast } from "vue-toastification";
 
 const toast = useToast();

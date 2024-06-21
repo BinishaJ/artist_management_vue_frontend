@@ -44,9 +44,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "vue-toastification";
-import { axiosInstance } from "../axios/axios";
+import { axiosInstance } from "../../axios/axios";
 import { saveAs } from "file-saver";
-import { useUserStore } from "../stores/user";
+import { useUserStore } from "../../stores/user";
 
 const toast = useToast();
 const role_id = useUserStore().user.role_id;

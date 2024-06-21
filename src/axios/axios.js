@@ -32,6 +32,9 @@ const setupInterceptors = () => {
       if (error.response && error.response.status === 403) {
         router.push({ path: "/logout" });
       }
+      if (error.response && error.response.status === 404) {
+        window.history.length > 2 ? router.go(-1) : router.push("/");
+      }
       return Promise.reject(error);
     }
   );

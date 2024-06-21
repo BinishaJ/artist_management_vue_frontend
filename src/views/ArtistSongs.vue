@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-vue-next";
-import { ref, onMounted, defineProps } from "vue";
+import { ref, onMounted } from "vue";
 import {
   Dialog,
   DialogClose,

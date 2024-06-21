@@ -74,7 +74,7 @@ const onSubmit = form.handleSubmit(async (values) => {
 <template>
   <div class="w-full flex justify-center items-center">
     <div class="w-full md:w-[50%] flex flex-col justify-center items-center">
-      <div class="mb-8">
+      <div class="mb-8 text-center">
         <p class="font-semibold text-3xl mb-2">Welcome Back!</p>
         <p class="light-text text-sm">Please enter your login details</p>
       </div>

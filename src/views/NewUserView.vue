@@ -25,7 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { ref, computed, reactive, defineProps } from "vue";
+import { ref, computed, reactive } from "vue";
 import * as z from "zod";
 import { toTypedSchema } from "@vee-validate/zod";
 import { Calendar } from "@/components/ui/calendar";

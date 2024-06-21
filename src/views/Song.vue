@@ -25,7 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { reactive, defineProps, onMounted, ref } from "vue";
+import { reactive, onMounted, ref } from "vue";
 import * as z from "zod";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useToast } from "vue-toastification";

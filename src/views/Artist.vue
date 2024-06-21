@@ -25,7 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { computed, reactive, defineProps } from "vue";
+import { computed, reactive } from "vue";
 import * as z from "zod";
 import { toTypedSchema } from "@vee-validate/zod";
 import { Calendar } from "@/components/ui/calendar";
@@ -111,7 +111,9 @@ const formSchema = toTypedSchema(
       .max(new Date().getFullYear(), {
         message: "Release year can't be greater than current year",
       }),
-    no_of_albums_released: z.number({ message: "Field is required" }).min(0),
+    no_of_albums_released: z
+      .number({ message: "Field is required" })
+      .min(0, { message: "Albums Released must be a valid number" }),
   })
 );
 
